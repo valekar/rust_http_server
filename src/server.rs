@@ -1,8 +1,7 @@
 //use super::http::request::Request;
-use crate::http::Request;
-use std::convert::TryInto;
+use crate::http::{Request, Response, StatusCode};
 use std::net::TcpListener;
-use std::{convert::TryFrom, io::Read};
+use std::{convert::TryFrom, io::Read, io::Write};
 //struct is like class
 pub struct Server {
     addr: String,
@@ -33,15 +32,23 @@ impl Server {
                         Ok(_) => {
                             println!("Received a request: {}", String::from_utf8_lossy(&buffer));
                             // we need to put the bounds here as try_from type is generic one
-                            match Request::try_from(&buffer[..]) {
+                            let response = match Request::try_from(&buffer[..]) {
                                 Ok(request) => {
                                     dbg!(request);
+                                    Response::new(
+                                        StatusCode::OK,
+                                        Some("<h1>It works</h1>".to_string()),
+                                    )
                                 }
                                 Err(e) => {
                                     println!("failed to parse the request {}", e);
+                                    Response::new(StatusCode::BadRequest, None)
                                 }
-                            } // conversion way 1
-                              //let result: &Result<Request, _> = &buffer[..].try_into(); - conversion way 2
+                            };
+
+                            if let Err(e) = response.send(&mut stream) {
+                                println!("Failed to send the reponse: {}", e);
+                            }
                         }
                         Err(e) => {
                             println!("failed to read from the request {}", e);
