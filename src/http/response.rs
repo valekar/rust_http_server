@@ -17,7 +17,9 @@ impl Response {
         Response { status_code, body }
     }
 
-    pub fn send(&self, stream: &mut TcpStream) -> IoResult<()> {
+    // here dyn Write is a dynamic and impl Write is a
+    //static dispatch , it could use traits of file or TCPStream or any thing that implements Write trait
+    pub fn send(&self, stream: &mut impl Write) -> IoResult<()> {
         let mut body = "";
 
         if let Some(i) = &self.body {
