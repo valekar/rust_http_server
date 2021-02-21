@@ -15,6 +15,7 @@ pub struct Request<'buf> {
     method: Method,
 }
 
+//getters
 impl<'buf> Request<'buf> {
     pub fn path(&self) -> &str {
         &self.path
