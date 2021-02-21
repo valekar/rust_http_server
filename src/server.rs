@@ -1,7 +1,7 @@
 //use super::http::request::Request;
 use crate::http::{Request, Response, StatusCode};
 use std::net::TcpListener;
-use std::{convert::TryFrom, io::Read, io::Write};
+use std::{convert::TryFrom, io::Read};
 //struct is like class
 pub struct Server {
     addr: String,
