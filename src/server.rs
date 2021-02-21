@@ -1,7 +1,17 @@
 //use super::http::request::Request;
-use crate::http::{Request, Response, StatusCode};
+use crate::http::{ParseError, Request, Response, StatusCode};
 use std::net::TcpListener;
 use std::{convert::TryFrom, io::Read};
+
+pub trait Handler {
+    fn handle_request(&mut self, request: &Request) -> Response;
+
+    fn handle_bad_reqeust(&mut self, e: &ParseError) -> Response {
+        println!("failed to parse the request {}", e);
+        Response::new(StatusCode::BadRequest, None)
+    }
+}
+
 //struct is like class
 pub struct Server {
     addr: String,
@@ -20,7 +30,7 @@ impl Server {
     }
 
     // methods
-    pub fn run(self) {
+    pub fn run(self, mut handler: impl Handler) {
         println!("Server running on {}", self.addr);
         let listener = TcpListener::bind(&self.addr).unwrap();
 
@@ -34,15 +44,17 @@ impl Server {
                             // we need to put the bounds here as try_from type is generic one
                             let response = match Request::try_from(&buffer[..]) {
                                 Ok(request) => {
-                                    dbg!(request);
+                                    /* dbg!(request);
                                     Response::new(
                                         StatusCode::OK,
                                         Some("<h1>It works</h1>".to_string()),
-                                    )
+                                    ) */
+                                    handler.handle_request(&request)
                                 }
                                 Err(e) => {
-                                    println!("failed to parse the request {}", e);
-                                    Response::new(StatusCode::BadRequest, None)
+                                    /*  println!("failed to parse the request {}", e);
+                                    Response::new(StatusCode::BadRequest, None) */
+                                    handler.handle_bad_reqeust(&e)
                                 }
                             };
 
