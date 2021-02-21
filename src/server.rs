@@ -7,7 +7,7 @@ pub struct Server {
     addr: String,
 }
 
-fn arr(a: &[u8]) {}
+//fn arr(a: &[u8]) {}
 
 impl Server {
     // two types functionality
